@@ -1,7 +1,7 @@
 import os
 
 
-def wordLookup(folder, word):
+def wordLookup(folder, word, matchFiles: list = []):
     folderElms = []
     fileElms = []
     for subElm in os.listdir(folder):
@@ -17,11 +17,15 @@ def wordLookup(folder, word):
             continue
 
     for fileElm in fileElms:
-        if word in os.path.basename(fileElm):
+        if word in os.path.basename(fileElm) and fileElm not in matchFiles:
+            matchFiles.append(fileElm)
             print(f"Found <{word}> at [{fileElm}]")
         continue
+
     for folderElm in folderElms:
-        wordLookup(folderElm, word)
+        matchFiles = wordLookup(folderElm, word)
+
+    return matchFiles
 
 
 if __name__ == '__main__':
@@ -29,4 +33,4 @@ if __name__ == '__main__':
     folder = "D:\\The Volt"
     check = os.path.exists(folder)
     print(f"Folder Check: {check}\n")
-    wordLookup(folder, word)
+    matchFiles = wordLookup(folder, word)
