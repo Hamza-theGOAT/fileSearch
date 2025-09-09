@@ -83,17 +83,6 @@ class fileLookup:
             row=0, column=0, padx=10, pady=10
         )
 
-    def browseFolder(self):
-        """Open folder dialog to select folder to search files in"""
-        folderPath = filedialog.askdirectory(title="Select Folder")
-
-        if folderPath:
-            self.currentFolder = folderPath
-            self.matchedFiles = wordLookup(
-                self.currentFolder,
-                'inv_rec'
-            )
-
     def resultDisplaySection(self):
         """Main body to display results from search"""
         self.resultDisplayFrame = ctk.CTkFrame(
@@ -104,6 +93,50 @@ class fileLookup:
         )
         self.resultDisplayFrame.grid(
             row=1, column=0, sticky="nsew", padx=10, pady=10)
+
+        # A scrollable frame inside
+        self.resultsFrame = ctk.CTkScrollableFrame(
+            self.resultDisplayFrame,
+            fg_color="#1a1d23",
+            border_width=0
+        )
+        self.resultsFrame.pack(fill="both", expand=True, padx=5, pady=5)
+
+    def browseFolder(self):
+        """Open folder dialog to select folder to search files in"""
+        folderPath = filedialog.askdirectory(title="Select Folder")
+
+        if folderPath:
+            self.currentFolder = folderPath
+            self.matchedFiles = wordLookup(
+                self.currentFolder,
+                'inv_rec'
+            )
+            self.showResults(self.matchedFiles)
+
+    def showResults(self, filePaths):
+        # Clear old results first
+        for widget in self.resultsFrame.winfo_children():
+            widget.destroy()
+
+        # Display each file as a rectangular item
+        for idx, path in enumerate(filePaths):
+            self.itemFrame = ctk.CTkFrame(
+                self.resultsFrame,
+                fg_color="#23272f",
+                border_width=1,
+                border_color="#23272f",
+                corner_radius=6
+            )
+            self.itemFrame.pack(fill="x", padx=4, pady=4)
+
+            label = ctk.CTkLabel(
+                self.itemFrame,
+                text=path,
+                anchor="w",
+                text_color="white"
+            )
+            label.pack(side="left", fill="x", expand=True, padx=8, pady=8)
 
     def run(self):
         """Start the GUI application"""
