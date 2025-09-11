@@ -3,6 +3,7 @@ from tkinter import filedialog
 import threading
 from PIL import Image
 import os
+import subprocess
 
 
 def wordLookup(folder: os.path, word: str, matchFiles: list = []):
@@ -22,6 +23,7 @@ def wordLookup(folder: os.path, word: str, matchFiles: list = []):
 
     for fileElm in fileElms:
         if word in os.path.basename(fileElm) and fileElm not in matchFiles:
+            fileElm = fileElm.replace('/', '\\')
             matchFiles.append(fileElm)
             print(f"Found <{word}> at [{fileElm}]")
         continue
@@ -110,7 +112,7 @@ class fileLookup:
             self.currentFolder = folderPath
             self.matchedFiles = wordLookup(
                 self.currentFolder,
-                'inv_rec'
+                'main.py'
             )
             self.showResults(self.matchedFiles)
 
@@ -119,24 +121,65 @@ class fileLookup:
         for widget in self.resultsFrame.winfo_children():
             widget.destroy()
 
+        # Configure the resultsFrame to expand the itemFrames
+        self.resultsFrame.grid_columnconfigure(0, weight=1)
+
         # Display each file as a rectangular item
         for idx, path in enumerate(filePaths):
-            self.itemFrame = ctk.CTkFrame(
+            folder = os.path.dirname(path)
+            file = os.path.basename(path)
+
+            # Create a new frame for each item (use local variable, not self.itemFrame)
+            itemFrame = ctk.CTkFrame(
                 self.resultsFrame,
                 fg_color="#23272f",
                 border_width=1,
                 border_color="#23272f",
                 corner_radius=6
             )
-            self.itemFrame.pack(fill="x", padx=4, pady=4)
 
-            label = ctk.CTkLabel(
-                self.itemFrame,
+            # Grid the itemFrame for this iteration
+            itemFrame.grid(row=idx, column=0, sticky="ew", padx=4, pady=4)
+
+            # Configure column weights for THIS itemFrame
+            itemFrame.grid_columnconfigure(0, weight=3, minsize=200)
+            itemFrame.grid_columnconfigure(1, weight=6, minsize=300)
+            itemFrame.grid_columnconfigure(2, weight=1, minsize=100)
+
+            # Create filename label for THIS itemFrame
+            filenameLabel = ctk.CTkLabel(
+                itemFrame,
+                text=file,
+                anchor="w",
+                text_color="white"
+            )
+            filenameLabel.grid(row=0, column=0, padx=8, pady=8, sticky="w")
+
+            # Create path label for THIS itemFrame
+            pathLabel = ctk.CTkLabel(
+                itemFrame,
                 text=path,
                 anchor="w",
                 text_color="white"
             )
-            label.pack(side="left", fill="x", expand=True, padx=8, pady=8)
+            pathLabel.grid(row=0, column=1, padx=8, pady=8, sticky="ew")
+
+            # Create open button for THIS itemFrame
+            openBtn = ctk.CTkButton(
+                itemFrame,
+                text="Open",
+                width=60,
+                command=lambda p=folder: self.openInExplorer(p)
+            )
+            openBtn.grid(row=0, column=2, padx=6, pady=6)
+
+    def openInExplorer(self, path):
+        if os.path.isfile(path):
+            print(f"Opening File: {path}")
+            subprocess.run(["explorer", "/select", path])
+        elif os.path.isdir(path):
+            print(f"Opening Folder: {path}")
+            subprocess.run(["explorer", path])
 
     def run(self):
         """Start the GUI application"""
