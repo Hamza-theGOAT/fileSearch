@@ -4,6 +4,7 @@ import threading
 from PIL import Image
 import os
 import subprocess
+import logging
 
 
 def wordLookup(folder: os.path, word: str, matchFiles: list = []):
@@ -32,6 +33,17 @@ def wordLookup(folder: os.path, word: str, matchFiles: list = []):
         matchFiles = wordLookup(folderElm, word)
 
     return matchFiles
+
+
+def safeRun(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logging.error(
+                f"Error in {func.__name__}: [{type(e).__name__}] ...")
+            logging.error(f"{e}")
+    return wrapper
 
 
 ctk.set_appearance_mode("dark")
