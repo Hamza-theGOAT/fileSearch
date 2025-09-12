@@ -7,6 +7,18 @@ import subprocess
 import logging
 
 
+def safeRun(func):
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            logging.error(
+                f"Error in {func.__name__}: [{type(e).__name__}] ...")
+            logging.error(f"{e}")
+    return wrapper
+
+
+@safeRun
 def wordLookup(folder: os.path, word: str, matchFiles: list = []):
     folderElms = []
     fileElms = []
@@ -35,17 +47,6 @@ def wordLookup(folder: os.path, word: str, matchFiles: list = []):
     return matchFiles
 
 
-def safeRun(func):
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            logging.error(
-                f"Error in {func.__name__}: [{type(e).__name__}] ...")
-            logging.error(f"{e}")
-    return wrapper
-
-
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("dark-blue")
 
@@ -59,6 +60,7 @@ class fileLookup:
         # Main frame creation
         self.mainSection()
 
+    @safeRun
     def mainSection(self):
         self.mainFrame = ctk.CTkFrame(
             self.root,
@@ -116,6 +118,7 @@ class fileLookup:
         )
         self.resultsFrame.pack(fill="both", expand=True, padx=5, pady=5)
 
+    @safeRun
     def browseFolder(self):
         """Open folder dialog to select folder to search files in"""
         folderPath = filedialog.askdirectory(title="Select Folder")
@@ -128,6 +131,7 @@ class fileLookup:
             )
             self.showResults(self.matchedFiles)
 
+    @safeRun
     def showResults(self, filePaths):
         # Clear old results first
         for widget in self.resultsFrame.winfo_children():
@@ -185,6 +189,7 @@ class fileLookup:
             )
             openBtn.grid(row=0, column=2, padx=6, pady=6)
 
+    @safeRun
     def openInExplorer(self, path):
         if os.path.isfile(path):
             print(f"Opening File: {path}")
@@ -198,6 +203,7 @@ class fileLookup:
         self.root.mainloop()
 
 
+@safeRun
 def main():
     word = input("Word(s) inside the filename: ")
     folder = "D:\\The Volt"
