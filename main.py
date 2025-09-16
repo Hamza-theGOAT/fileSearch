@@ -142,9 +142,6 @@ class fileLookup:
         )
         self.resultsFrame.pack(fill="both", expand=True, padx=5, pady=5)
 
-    def performSearch(self):
-        pass
-
     @safeRun
     def browseFolder(self):
         """Open folder dialog to select folder to search files in"""
@@ -152,11 +149,25 @@ class fileLookup:
 
         if folderPath:
             self.currentFolder = folderPath
-            self.matchedFiles = wordLookup(
-                self.currentFolder,
-                'main.py'
-            )
-            self.showResults(self.matchedFiles)
+
+    @safeRun
+    def performSearch(self):
+        """Perform search using the current folder and search box text"""
+        # Get search term from the search box
+        searchTerm = self.searchBox.get().strip()
+
+        # Validate inputs
+        if not searchTerm:
+            return
+
+        if not self.currentFolder:
+            return
+
+        # Perform the search
+        matchedFiles = wordLookup(self.currentFolder, searchTerm)
+
+        if matchedFiles:
+            self.showResults(matchedFiles)
 
     @safeRun
     def showResults(self, filePaths):
