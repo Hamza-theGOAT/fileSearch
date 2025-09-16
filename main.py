@@ -87,6 +87,7 @@ class fileLookup:
         self.topFrame.grid_rowconfigure(0, weight=1)
         self.topFrame.grid_columnconfigure(0, weight=0)
         self.topFrame.grid_columnconfigure(1, weight=1)
+        self.topFrame.grid_columnconfigure(2, weight=0)
 
         self.browseBtn = ctk.CTkButton(
             self.topFrame,
@@ -98,6 +99,29 @@ class fileLookup:
         self.browseBtn.grid(
             row=0, column=0, padx=10, pady=10
         )
+
+        self.searchBox = ctk.CTkEntry(
+            self.topFrame,
+            placeholder_text="Search Term ...",
+            textvariable=None,
+            height=40
+        )
+        self.searchBox.grid(
+            row=0, column=1, padx=10, pady=10, sticky="ew"
+        )
+
+        self.searchBtn = ctk.CTkButton(
+            self.topFrame,
+            text="🔍 Search",
+            command=self.performSearch,
+            height=40,
+            width=100
+        )
+        self.searchBtn.grid(
+            row=0, column=2, padx=10, pady=10
+        )
+
+        self.searchBox.bind("<Return>", lambda event: self.performSearch())
 
     def resultDisplaySection(self):
         """Main body to display results from search"""
@@ -117,6 +141,9 @@ class fileLookup:
             border_width=0
         )
         self.resultsFrame.pack(fill="both", expand=True, padx=5, pady=5)
+
+    def performSearch(self):
+        pass
 
     @safeRun
     def browseFolder(self):
@@ -158,16 +185,17 @@ class fileLookup:
             itemFrame.grid(row=idx, column=0, sticky="ew", padx=4, pady=4)
 
             # Configure column weights for THIS itemFrame
-            itemFrame.grid_columnconfigure(0, weight=3, minsize=200)
-            itemFrame.grid_columnconfigure(1, weight=6, minsize=300)
-            itemFrame.grid_columnconfigure(2, weight=1, minsize=100)
+            itemFrame.grid_columnconfigure(0, weight=0, minsize=200)
+            itemFrame.grid_columnconfigure(1, weight=1, minsize=300)
+            itemFrame.grid_columnconfigure(2, weight=0, minsize=100)
 
             # Create filename label for THIS itemFrame
             filenameLabel = ctk.CTkLabel(
                 itemFrame,
                 text=file,
                 anchor="w",
-                text_color="white"
+                text_color="white",
+                justify="left"
             )
             filenameLabel.grid(row=0, column=0, padx=8, pady=8, sticky="w")
 
@@ -176,7 +204,8 @@ class fileLookup:
                 itemFrame,
                 text=path,
                 anchor="w",
-                text_color="white"
+                text_color="white",
+                justify="left"
             )
             pathLabel.grid(row=0, column=1, padx=8, pady=8, sticky="ew")
 
