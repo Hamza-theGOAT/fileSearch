@@ -19,7 +19,10 @@ def safeRun(func):
 
 
 @safeRun
-def wordLookup(folder: os.path, word: str, matchFiles: list = []):
+def wordLookup(folder: os.path, word: str, matchFiles: list = None):
+    if matchFiles is None:
+        matchFiles = []
+
     folderElms = []
     fileElms = []
     for subElm in os.listdir(folder):
@@ -42,7 +45,7 @@ def wordLookup(folder: os.path, word: str, matchFiles: list = []):
         continue
 
     for folderElm in folderElms:
-        matchFiles = wordLookup(folderElm, word)
+        wordLookup(folderElm, word, matchFiles)
 
     return matchFiles
 
@@ -164,7 +167,7 @@ class fileLookup:
             return
 
         # Perform the search
-        matchedFiles = wordLookup(self.currentFolder, searchTerm)
+        matchedFiles = wordLookup(self.currentFolder, searchTerm, [])
 
         if matchedFiles:
             self.showResults(matchedFiles)
